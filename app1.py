@@ -12,44 +12,54 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---------- Estilos Personalizados (Tema Oscuro + Azul Neón Suave) ----------
+# ---------- Estilos Personalizados (Fondo Blanco Elegante + Alto Contraste) ----------
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
     :root {
-        --bg-main: #0D1117;
-        --bg-card: rgba(22, 27, 34, 0.85);
-        --border-color: rgba(56, 189, 248, 0.2);
-        --accent-blue: #38BDF8;
-        --accent-glow: #0284C7;
-        --text-bright: #F9FAFB;
-        --text-muted: #9CA3AF;
+        --bg-main: #FFFFFF;
+        --bg-sidebar: #F8FAFC;
+        --bg-card: #FFFFFF;
+        --border-color: #E2E8F0;
+        --accent-blue: #0284C7;
+        --accent-hover: #0369A1;
+        --text-primary: #0F172A;
+        --text-secondary: #475569;
     }
 
-    /* Fondo general */
+    /* Fondo principal blanco */
     .stApp {
-        background: radial-gradient(circle at 50% 0%, #1E293B 0%, #0F172A 50%, #090D16 100%) !important;
-        background-attachment: fixed !important;
-        color: var(--text-bright);
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary);
         font-family: 'Inter', sans-serif;
     }
 
-    /* Barra lateral */
+    /* Barra lateral clara */
     section[data-testid="stSidebar"] {
-        background-color: rgba(15, 23, 42, 0.95) !important;
+        background-color: var(--bg-sidebar) !important;
         border-right: 1px solid var(--border-color) !important;
     }
 
-    /* Encabezados */
+    /* Textos y etiquetas en negro/gris oscuro legible */
+    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] {
+        color: var(--text-primary) !important;
+    }
+
+    /* Textos secundarios */
+    .hero-subtitle, .stCaption, [data-testid="stCaptionContainer"] {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Badge superior */
     .hero-tag {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(56, 189, 248, 0.1);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        color: var(--accent-blue);
-        padding: 0.3rem 0.8rem;
+        background: #F0F9FF;
+        border: 1px solid #BAE6FD;
+        color: var(--accent-blue) !important;
+        padding: 0.35rem 0.85rem;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
@@ -57,52 +67,39 @@ st.markdown("""
     }
 
     .hero-title {
-        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 1.2;
         margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #FFFFFF 40%, var(--accent-blue) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-primary) !important;
     }
 
     .hero-subtitle {
         font-size: 1.05rem;
-        color: var(--text-muted);
         max-width: 65ch;
         line-height: 1.5;
         margin-bottom: 1.5rem;
     }
 
-    /* Tarjetas de contenido */
-    .custom-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 1.25rem;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        margin-bottom: 1rem;
-    }
-
+    /* Títulos de sección */
     .card-header {
         font-size: 0.9rem;
         font-weight: 600;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: var(--accent-blue);
+        color: var(--accent-blue) !important;
         margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    /* Botones primarios */
+    /* Estilo de botones */
     .stButton>button, .stDownloadButton>button {
         border-radius: 8px !important;
         border: 1px solid var(--accent-blue) !important;
-        background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+        background: var(--accent-blue) !important;
         color: #FFFFFF !important;
         font-weight: 600 !important;
         padding: 0.6rem 1.2rem !important;
@@ -111,13 +108,21 @@ st.markdown("""
     }
 
     .stButton>button:hover, .stDownloadButton>button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important;
-        border-color: #7DD3FC !important;
+        background: var(--accent-hover) !important;
+        border-color: var(--accent-hover) !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2) !important;
     }
 
-    /* Accesibilidad en lectores de pantalla y foco visual */
-    button:focus-visible, input:focus-visible {
+    /* Ajustes para cajas de texto y campos de entrada */
+    textarea, input {
+        border-radius: 8px !important;
+        border: 1px solid var(--border-color) !important;
+        background-color: #FFFFFF !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Resaltado para accesibilidad */
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
         outline: 2px solid var(--accent-blue) !important;
         outline-offset: 2px;
     }
@@ -174,7 +179,7 @@ else:
 
 # ---------- Procesamiento y Despliegue ----------
 if img_cv is not None:
-    # Aplicar filtros elegidos por el usuario
+    # Aplicar filtros
     if filtro == 'Escala de grises':
         procesada = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     elif filtro == 'Blanco y negro (Umbral)':
@@ -185,7 +190,7 @@ if img_cv is not None:
     else:
         procesada = img_cv
 
-    # Asegurar formato correcto para visualización y OCR
+    # Formato para Streamlit y OCR
     if len(procesada.shape) == 2:
         img_rgb = procesada
     else:
@@ -205,7 +210,6 @@ if img_cv is not None:
                 texto_detectado = pytesseract.image_to_string(img_rgb, lang=lang_code)
 
             if texto_detectado.strip():
-                # Cuadro de texto interactivo para copiar
                 st.text_area(
                     label="Texto extraído:",
                     value=texto_detectado,
@@ -213,14 +217,12 @@ if img_cv is not None:
                     help="Puedes seleccionar y copiar directamente este texto."
                 )
                 
-                # Métricas rápidas
                 num_palabras = len(texto_detectado.split())
                 num_caracteres = len(texto_detectado)
                 st.caption(f"📊 **Resumen:** {num_palabras} palabras | {num_caracteres} caracteres")
                 
-                # Descargar resultado
                 st.download_button(
-                    label="⬇️ Descargar texto (.txt)",
+                    label="Descargar texto (.txt)",
                     data=texto_detectado,
                     file_name="texto_extraido.txt",
                     mime="text/plain",
