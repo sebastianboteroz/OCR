@@ -6,207 +6,248 @@ from PIL import Image
 
 # ---------- Configuración de página ----------
 st.set_page_config(
-    page_title="OCR - Reconocimiento de Caracteres",
+    page_title="OCR Vision - Reconocimiento de Texto",
     page_icon="🔎",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# ---------- Estilos personalizados ----------
+# ---------- Estilos personalizados (Dark + Blue Gradient + Responsive) ----------
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
+    /* Variables de diseño */
     :root {
-        --paper: #FAFAF7;
-        --ink: #17171A;
-        --ink-soft: #6B6B65;
-        --line: #DEDED4;
-        --scan-red: #E8402C;
+        --bg-dark: #080B10;
+        --card-bg: rgba(16, 22, 34, 0.65);
+        --card-border: rgba(56, 189, 248, 0.18);
+        --accent-blue: #38BDF8;
+        --accent-glow: #1E40AF;
+        --text-primary: #F3F4F6;
+        --text-secondary: #9CA3AF;
     }
 
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    /* Fondo global con gradiente azul profundo */
+    .stApp {
+        background: radial-gradient(circle at 50% -20%, #1E3A8A 0%, #0F172A 45%, #030712 100%) !important;
+        background-attachment: fixed !important;
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
+    }
 
-    .stApp { background-color: var(--paper); }
-
+    /* Sidebar adaptada al tema oscuro */
     section[data-testid="stSidebar"] {
-        background-color: #F2F2EC;
-        border-right: 1px solid var(--line);
+        background-color: rgba(3, 7, 18, 0.85) !important;
+        border-right: 1px solid var(--card-border) !important;
+        backdrop-filter: blur(12px);
     }
-    section[data-testid="stSidebar"] * { font-family: 'Inter', sans-serif; }
 
-    .block-container { padding-top: 2.5rem; max-width: 1100px; }
+    /* Contenedor principal responsive */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1200px;
+    }
 
-    /* ---- Encabezado ---- */
+    /* Encabezado Principal */
     .eyebrow {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.8rem;
-        letter-spacing: 0.15em;
-        color: var(--scan-red);
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.85rem;
+        letter-spacing: 0.2em;
+        color: var(--accent-blue);
         text-transform: uppercase;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        font-weight: 600;
     }
     .eyebrow::before {
         content: "";
-        width: 7px; height: 7px;
-        background: var(--scan-red);
+        width: 8px;
+        height: 8px;
+        background: var(--accent-blue);
         border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent-blue);
         display: inline-block;
     }
 
     .main-title {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 4.2rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(2.2rem, 5vw, 4rem);
         font-weight: 700;
-        letter-spacing: -0.02em;
-        line-height: 1;
-        margin: 0 0 0.6rem 0;
-        color: var(--ink);
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin: 0 0 0.8rem 0;
+        background: linear-gradient(135deg, #FFFFFF 30%, var(--accent-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-    .main-title span { color: var(--ink-soft); }
 
     .subtitle {
-        font-size: 1.05rem;
-        color: var(--ink-soft);
-        margin-bottom: 2.2rem;
-        max-width: 40ch;
+        font-size: clamp(0.95rem, 2vw, 1.15rem);
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        max-width: 60ch;
+        font-weight: 300;
     }
 
     hr.divider {
         border: none;
-        border-top: 1px solid var(--line);
-        margin: 1.8rem 0;
+        height: 1px;
+        background: linear-gradient(90deg, var(--card-border) 0%, rgba(255,255,255,0) 100%);
+        margin: 1.5rem 0 2.5rem 0;
     }
 
-    /* ---- Etiquetas tipo instrumento para cada panel ---- */
+    /* Contenedores de paneles */
     .panel-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.75rem;
-        letter-spacing: 0.12em;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
-        color: var(--ink-soft);
-        border-bottom: 1px solid var(--line);
+        color: var(--accent-blue);
+        border-bottom: 1px solid var(--card-border);
         padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
+        font-weight: 600;
     }
 
-    /* ---- Marco tipo visor de escáner alrededor de la cámara ---- */
+    /* Visor de la cámara personalizado */
     div[data-testid="stCameraInput"] {
-        position: relative;
-        padding: 14px;
-        border: 1px solid var(--line);
-        background: #ffffff;
-    }
-    div[data-testid="stCameraInput"]::before,
-    div[data-testid="stCameraInput"]::after {
-        content: "";
-        position: absolute;
-        width: 22px; height: 22px;
-        border-color: var(--scan-red);
-        border-style: solid;
-        z-index: 5;
-    }
-    div[data-testid="stCameraInput"]::before {
-        top: 6px; left: 6px;
-        border-width: 3px 0 0 3px;
-    }
-    div[data-testid="stCameraInput"]::after {
-        bottom: 6px; right: 6px;
-        border-width: 0 3px 3px 0;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        background: var(--card-bg);
+        backdrop-filter: blur(8px);
+        padding: 10px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
+    /* Caja de resultado de texto */
     .result-box {
-        background-color: #ffffff;
-        border: 1px solid var(--line);
-        border-left: 3px solid var(--scan-red);
-        padding: 1.2rem 1.4rem;
-        font-family: 'IBM Plex Mono', monospace;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-left: 4px solid var(--accent-blue);
+        border-radius: 8px;
+        padding: 1.4rem;
+        font-family: 'Inter', monospace;
         font-size: 0.95rem;
-        line-height: 1.55;
-        color: var(--ink);
+        line-height: 1.6;
+        color: #E5E7EB;
         white-space: pre-wrap;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(10px);
+        min-height: 150px;
     }
 
-    .stCaption, [data-testid="stCaptionContainer"] {
-        font-family: 'IBM Plex Mono', monospace !important;
-    }
-
-    /* Botones */
+    /* Estilización de Botones */
     .stButton>button, .stDownloadButton>button {
-        border-radius: 2px;
-        border: 1px solid var(--ink);
-        background: var(--ink);
-        color: var(--paper);
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.85rem;
-        letter-spacing: 0.05em;
+        border-radius: 8px !important;
+        border: 1px solid var(--accent-blue) !important;
+        background: linear-gradient(135deg, #1E3A8A 0%, #0284C7 100%) !important;
+        color: #FFFFFF !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.03em !important;
+        padding: 0.6rem 1.2rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2) !important;
+        width: 100%;
     }
+
     .stButton>button:hover, .stDownloadButton>button:hover {
-        background: var(--scan-red);
-        border-color: var(--scan-red);
-        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.5) !important;
+        border-color: #38BDF8 !important;
+    }
+
+    /* Ajustes responsivos para pantallas pequeñas */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-top: 1rem;
+        }
+        .main-title {
+            text-align: left;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="eyebrow">Instrumento de lectura</p>', unsafe_allow_html=True)
-st.markdown('<p class="main-title">OCR<span>_</span>Vision</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Apunta, captura y extrae el texto de cualquier imagen en segundos.</p>', unsafe_allow_html=True)
+# ---------- Encabezado ----------
+st.markdown('<p class="eyebrow">Instrumento de Lectura Óptica</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">OCR_Vision</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Captura imágenes mediante la cámara o carga un archivo para extraer texto de forma precisa en tiempo real.</p>', unsafe_allow_html=True)
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
-# ---------- Sidebar: opciones ----------
+# ---------- Sidebar: Opciones ----------
 with st.sidebar:
     st.header("⚙️ Configuración")
 
-    with st.expander("Filtros de imagen", expanded=True):
+    with st.expander("Filtros de Imagen", expanded=True):
         filtro = st.radio(
             "Preprocesamiento",
             ('Sin Filtro', 'Escala de grises', 'Blanco y negro (umbral)', 'Invertir colores'),
-            help="La escala de grises y el umbral suelen mejorar mucho la precisión del OCR"
+            help="El preprocesamiento ayuda a reducir el ruido visual y mejorar la detección de caracteres."
         )
+        umbral = 128
         if filtro == 'Blanco y negro (umbral)':
             umbral = st.slider("Sensibilidad del umbral", 0, 255, 128)
 
-    with st.expander("Idioma de reconocimiento"):
-        idioma = st.selectbox("Idioma", ("Español", "Inglés"), index=0)
+    with st.expander("Idioma de Reconocimiento", expanded=True):
+        idioma = st.selectbox("Idioma Tesseract", ("Español", "Inglés"), index=0)
         lang_code = "spa" if idioma == "Español" else "eng"
 
-# ---------- Captura de imagen ----------
-img_file_buffer = st.camera_input("📷 Toma una Foto")
+# ---------- Selector de fuente de entrada ----------
+opcion_entrada = st.radio(
+    "Selecciona el método de entrada:",
+    ("📷 Cámara en vivo", "📁 Cargar archivo de imagen"),
+    horizontal=True
+)
 
-if img_file_buffer is not None:
-    bytes_data = img_file_buffer.getvalue()
-    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+img_cv = None
 
-    # Aplicar filtro seleccionado
+if opcion_entrada == "📷 Cámara en vivo":
+    img_file_buffer = st.camera_input("Capturar imagen")
+    if img_file_buffer is not None:
+        bytes_data = img_file_buffer.getvalue()
+        img_cv = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+
+else:
+    uploaded_file = st.file_uploader("Sube una imagen (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"])
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        img_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+# ---------- Procesamiento y renderizado ----------
+if img_cv is not None:
+    # Aplicación de filtros OpenCV
     if filtro == 'Escala de grises':
-        procesada = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2GRAY)
+        procesada = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     elif filtro == 'Blanco y negro (umbral)':
-        gris = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2GRAY)
+        gris = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         _, procesada = cv2.threshold(gris, umbral, 255, cv2.THRESH_BINARY)
     elif filtro == 'Invertir colores':
-        procesada = cv2.bitwise_not(cv2_img)
+        procesada = cv2.bitwise_not(img_cv)
     else:
-        procesada = cv2_img
+        procesada = img_cv
 
-    # Preparar imagen para mostrar y para OCR
-    if len(procesada.shape) == 2:  # imagen en escala de grises/binaria
+    # Conversión para despliegue en Streamlit
+    if len(procesada.shape) == 2:
         img_rgb = procesada
     else:
         img_rgb = cv2.cvtColor(procesada, cv2.COLOR_BGR2RGB)
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1], gap="medium")
 
     with col1:
-        st.markdown('<p class="panel-label">01 · Entrada</p>', unsafe_allow_html=True)
+        st.markdown('<p class="panel-label">01 · Vista Previa de Imagen</p>', unsafe_allow_html=True)
         st.image(img_rgb, use_container_width=True)
 
     with col2:
-        st.markdown('<p class="panel-label">02 · Texto extraído</p>', unsafe_allow_html=True)
+        st.markdown('<p class="panel-label">02 · Resultado del OCR</p>', unsafe_allow_html=True)
         try:
-            with st.spinner("Leyendo texto..."):
+            with st.spinner("Procesando y analizando texto..."):
                 text = pytesseract.image_to_string(img_rgb, lang=lang_code)
 
             if text.strip():
@@ -214,21 +255,21 @@ if img_file_buffer is not None:
 
                 palabras = len(text.split())
                 caracteres = len(text)
-                st.caption(f"📊 {palabras} palabras · {caracteres} caracteres")
+                st.caption(f"📊 Métricas: {palabras} palabras | {caracteres} caracteres")
 
                 st.download_button(
-                    label="⬇️ Descargar texto (.txt)",
+                    label=" Descargar texto (.txt)",
                     data=text,
                     file_name="texto_extraido.txt",
                     mime="text/plain"
                 )
             else:
-                st.warning("No se detectó texto en la imagen. Prueba con otro filtro o mejor iluminación.")
+                st.warning("No se detectó texto legible. Ajusta los filtros o intenta con una imagen con mayor contraste.")
 
         except pytesseract.TesseractNotFoundError:
-            st.error("⚠️ Tesseract OCR no está instalado en este sistema. Instálalo para usar esta app.")
+            st.error("⚠️ Tesseract OCR no está instalado en el servidor/sistema. Asegúrate de incluir las dependencias requeridas.")
         except Exception as e:
-            st.error(f"Ocurrió un error al procesar la imagen: {e}")
+            st.error(f"Error durante el procesamiento: {e}")
 
 else:
-    st.info("👆 Usa la cámara para capturar una imagen con texto y comenzar el reconocimiento.")
+    st.info("Utiliza la cámara o sube un archivo para iniciar la lectura del texto.")
