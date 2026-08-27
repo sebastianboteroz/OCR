@@ -14,70 +14,147 @@ st.set_page_config(
 # ---------- Estilos personalizados ----------
 st.markdown("""
     <style>
-    /* Fondo con degradado difuminado, tipo gaussian blur */
-    .stApp {
-        background: linear-gradient(-45deg, #1e1e2f, #3a1c71, #6a2c91, #d76d77, #ffaf7b);
-        background-size: 400% 400%;
-        animation: gradientMove 18s ease infinite;
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    :root {
+        --paper: #FAFAF7;
+        --ink: #17171A;
+        --ink-soft: #6B6B65;
+        --line: #DEDED4;
+        --scan-red: #E8402C;
     }
 
-    @keyframes gradientMove {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    /* Capa de blur encima del fondo para suavizar el degradado */
-    .stApp::before {
+    .stApp { background-color: var(--paper); }
+
+    section[data-testid="stSidebar"] {
+        background-color: #F2F2EC;
+        border-right: 1px solid var(--line);
+    }
+    section[data-testid="stSidebar"] * { font-family: 'Inter', sans-serif; }
+
+    .block-container { padding-top: 2.5rem; max-width: 1100px; }
+
+    /* ---- Encabezado ---- */
+    .eyebrow {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        color: var(--scan-red);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .eyebrow::before {
         content: "";
-        position: fixed;
-        inset: 0;
-        backdrop-filter: blur(80px);
-        -webkit-backdrop-filter: blur(80px);
-        z-index: 0;
-    }
-
-    .block-container {
-        position: relative;
-        z-index: 1;
+        width: 7px; height: 7px;
+        background: var(--scan-red);
+        border-radius: 50%;
+        display: inline-block;
     }
 
     .main-title {
-        font-size: 3.6rem;
-        font-weight: 900;
-        letter-spacing: -1px;
-        margin-bottom: 0;
-        background: linear-gradient(90deg, #ffffff, #ffd6e8, #ffffff);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        text-shadow: 0 4px 30px rgba(0,0,0,0.25);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 4.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin: 0 0 0.6rem 0;
+        color: var(--ink);
     }
+    .main-title span { color: var(--ink-soft); }
 
     .subtitle {
-        color: rgba(255,255,255,0.75);
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
+        font-size: 1.05rem;
+        color: var(--ink-soft);
+        margin-bottom: 2.2rem;
+        max-width: 40ch;
+    }
+
+    hr.divider {
+        border: none;
+        border-top: 1px solid var(--line);
+        margin: 1.8rem 0;
+    }
+
+    /* ---- Etiquetas tipo instrumento para cada panel ---- */
+    .panel-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* ---- Marco tipo visor de escáner alrededor de la cámara ---- */
+    div[data-testid="stCameraInput"] {
+        position: relative;
+        padding: 14px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+    }
+    div[data-testid="stCameraInput"]::before,
+    div[data-testid="stCameraInput"]::after {
+        content: "";
+        position: absolute;
+        width: 22px; height: 22px;
+        border-color: var(--scan-red);
+        border-style: solid;
+        z-index: 5;
+    }
+    div[data-testid="stCameraInput"]::before {
+        top: 6px; left: 6px;
+        border-width: 3px 0 0 3px;
+    }
+    div[data-testid="stCameraInput"]::after {
+        bottom: 6px; right: 6px;
+        border-width: 0 3px 3px 0;
     }
 
     .result-box {
-        background-color: rgba(255,255,255,0.9);
-        border-radius: 14px;
-        padding: 1.2rem;
-        border: 1px solid rgba(255,255,255,0.4);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        background-color: #ffffff;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--scan-red);
+        padding: 1.2rem 1.4rem;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.95rem;
+        line-height: 1.55;
+        color: var(--ink);
+        white-space: pre-wrap;
     }
 
-    /* Sidebar con un toque translúcido para que combine */
-    section[data-testid="stSidebar"] {
-        background-color: rgba(20, 20, 30, 0.5);
-        backdrop-filter: blur(20px);
+    .stCaption, [data-testid="stCaptionContainer"] {
+        font-family: 'IBM Plex Mono', monospace !important;
+    }
+
+    /* Botones */
+    .stButton>button, .stDownloadButton>button {
+        border-radius: 2px;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+    }
+    .stButton>button:hover, .stDownloadButton>button:hover {
+        background: var(--scan-red);
+        border-color: var(--scan-red);
+        color: white;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">🔎 OCR Vision</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Toma una foto y extrae el texto automáticamente</p>', unsafe_allow_html=True)
+st.markdown('<p class="eyebrow">Instrumento de lectura</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">OCR<span>_</span>Vision</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Apunta, captura y extrae el texto de cualquier imagen en segundos.</p>', unsafe_allow_html=True)
+st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # ---------- Sidebar: opciones ----------
 with st.sidebar:
@@ -123,11 +200,11 @@ if img_file_buffer is not None:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Imagen procesada")
+        st.markdown('<p class="panel-label">01 · Entrada</p>', unsafe_allow_html=True)
         st.image(img_rgb, use_container_width=True)
 
     with col2:
-        st.subheader("Texto detectado")
+        st.markdown('<p class="panel-label">02 · Texto extraído</p>', unsafe_allow_html=True)
         try:
             with st.spinner("Leyendo texto..."):
                 text = pytesseract.image_to_string(img_rgb, lang=lang_code)
