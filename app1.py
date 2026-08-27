@@ -14,26 +14,69 @@ st.set_page_config(
 # ---------- Estilos personalizados ----------
 st.markdown("""
     <style>
+    /* Fondo con degradado difuminado, tipo gaussian blur */
+    .stApp {
+        background: linear-gradient(-45deg, #1e1e2f, #3a1c71, #6a2c91, #d76d77, #ffaf7b);
+        background-size: 400% 400%;
+        animation: gradientMove 18s ease infinite;
+    }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Capa de blur encima del fondo para suavizar el degradado */
+    .stApp::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        backdrop-filter: blur(80px);
+        -webkit-backdrop-filter: blur(80px);
+        z-index: 0;
+    }
+
+    .block-container {
+        position: relative;
+        z-index: 1;
+    }
+
     .main-title {
-        font-size: 2.2rem;
-        font-weight: 700;
+        font-size: 3.6rem;
+        font-weight: 900;
+        letter-spacing: -1px;
         margin-bottom: 0;
+        background: linear-gradient(90deg, #ffffff, #ffd6e8, #ffffff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.25);
     }
+
     .subtitle {
-        color: #888;
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.75);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
     }
+
     .result-box {
-        background-color: #f7f7f9;
-        border-radius: 10px;
-        padding: 1rem;
-        border: 1px solid #e0e0e0;
+        background-color: rgba(255,255,255,0.9);
+        border-radius: 14px;
+        padding: 1.2rem;
+        border: 1px solid rgba(255,255,255,0.4);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    /* Sidebar con un toque translúcido para que combine */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(20, 20, 30, 0.5);
+        backdrop-filter: blur(20px);
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">🔎 Reconocimiento Óptico de Caracteres</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">🔎 OCR Vision</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Toma una foto y extrae el texto automáticamente</p>', unsafe_allow_html=True)
 
 # ---------- Sidebar: opciones ----------
